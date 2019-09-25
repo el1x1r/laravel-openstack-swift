@@ -2,9 +2,10 @@
 
 namespace Mzur\Filesystem;
 
+use Illuminate\Support\Arr;
 use League\Flysystem\Config;
 use League\Flysystem\Filesystem;
-use Biigle\CachedOpenStack\OpenStack;
+use OpenStack\OpenStack;
 use Illuminate\Support\ServiceProvider;
 
 class SwiftServiceProvider extends ServiceProvider
@@ -18,12 +19,12 @@ class SwiftServiceProvider extends ServiceProvider
     {
         $this->app['filesystem']->extend('swift', function($app, $config) {
             $options = $this->getOsOptions($config);
-            $container = (new OpenStack($app['cache'], $options))
+            $container = (new OpenStack($options))
                 ->objectStoreV1()
                 ->getContainer($config['container']);
 
-            $prefix = array_get($config, 'prefix', null);
-            $url = array_get($config, 'url', null);
+            $prefix = Arr::get($config, 'prefix', null);
+            $url = Arr::get($config, 'url', null);
             $adapter = new SwiftAdapter($container, $prefix, $url);
 
             return new Filesystem($adapter, $this->getFlyConfig($config));
@@ -40,6 +41,26 @@ class SwiftServiceProvider extends ServiceProvider
         //
     }
 
+    protected function getOsOptions($config)
+    {
+        if($config['auth'] == 'token') {
+            return $this->getTokenOsOptions($config);
+        }
+
+        return $this->getAccountOsOptions($config);
+    }
+
+
+    protected function getTokenOsOptions($config)
+    {
+        $tokenCached = \Auth::user()->authToken();
+        return [
+            'cachedToken' => $tokenCached,
+            'authUrl' => $config['authUrl'],
+            'region' => $config['region'],
+            'tokenId' => $tokenCached['id'],
+        ];
+    }
     /**
      * Get the OpenStack options.
      *
@@ -47,7 +68,7 @@ class SwiftServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    protected function getOsOptions($config)
+    protected function getAccountOsOptions($config)
     {
         $options = [
             'authUrl' => $config['authUrl'],
@@ -57,10 +78,10 @@ class SwiftServiceProvider extends ServiceProvider
                 'password' => $config['password'],
                 'domain' => ['name' => $config['domain']],
             ],
-            'debugLog' => array_get($config, 'debugLog', false),
-            'logger' => array_get($config, 'logger', null),
-            'messageFormatter' => array_get($config, 'messageFormatter', null),
-            'requestOptions' => array_get($config, 'requestOptions', []),
+            'debugLog' => Arr::get($config, 'debugLog', false),
+            'logger' => Arr::get($config, 'logger', null),
+            'messageFormatter' => Arr::get($config, 'messageFormatter', null),
+            'requestOptions' => Arr::get($config, 'requestOptions', []),
         ];
 
         if (array_key_exists('projectId', $config)) {
@@ -80,7 +101,7 @@ class SwiftServiceProvider extends ServiceProvider
     protected function getFlyConfig($config)
     {
         $flyConfig = new Config([
-            'disable_asserts' => array_get($config, 'disableAsserts', false),
+            'disable_asserts' => Arr::get($config, 'disableAsserts', false),
         ]);
 
         $passThroughConfig = [
