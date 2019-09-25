@@ -1,18 +1,28 @@
 {
-    "name": "mzur/laravel-openstack-swift",
+    "name": "el1x1r/laravel-openstack-swift",
     "description": "OpenStack Swift storage driver for Laravel 5.",
     "type": "library",
     "require": {
-        "mzur/flysystem-openstack-swift": "^1.0",
-        "biigle/laravel-cached-openstack": "^1.0",
+        "el1x1r/flysystem-openstack-swift": "dev-master",
+        "php-opencloud/openstack": "^3.0",
         "illuminate/support": "~5.1",
         "illuminate/filesystem": "~5.1"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/el1x1r/flysystem-openstack-swift.git"
+        }
+    ],
     "license": "MIT",
     "authors": [
         {
             "name": "Martin Zurowietz",
             "email": "martin@zurowietz.de"
+        },
+        {
+            "name": "Jorge Lipa",
+            "email": "jorge.lipa@jalasoft.com"
         }
     ],
     "autoload": {
