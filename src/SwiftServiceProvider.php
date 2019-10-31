@@ -43,6 +43,7 @@ class SwiftServiceProvider extends ServiceProvider
 
     protected function getOsOptions($config)
     {
+        $config['expireOn'] = session('expireOn', $config['expireOn']);
         if($config['auth'] == 'token') {
             return $this->getTokenOsOptions($config);
         }
