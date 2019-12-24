@@ -83,11 +83,17 @@ class SwiftServiceProvider extends ServiceProvider
             'debugLog' => Arr::get($config, 'debugLog', false),
             'logger' => Arr::get($config, 'logger', null),
             'messageFormatter' => Arr::get($config, 'messageFormatter', null),
-            'requestOptions' => Arr::get($config, 'requestOptions', []),
         ];
 
         if (array_key_exists('projectId', $config)) {
             $options['scope'] = ['project' => ['id' => $config['projectId']]];
+        }
+
+        if(Arr::get($config, 'certEnable', false)) {
+            $options['requestOptions'] = [
+                'verify'  => Arr::get($config, 'certFile', ''),
+                'headers' => ['User-Agent' => 'PHP-OPENCLOUD/SDKv1.0'],
+            ];
         }
 
         return $options;
