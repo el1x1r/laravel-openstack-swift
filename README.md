@@ -39,6 +39,8 @@ Add a new storage disk to `config/filesystems.php` (using v3 of the identity API
       'domain'    => env('OS_USER_DOMAIN_NAME', 'default'),
       'password'  => env('OS_PASSWORD', ''),
       'container' => env('OS_CONTAINER_NAME', ''),
+      'certEnable' => env('OS_CERT_ENABLE', 'false'),
+      'certFile' => env('OS_CERT_FILE', ''),
    ],
 ]
 ```

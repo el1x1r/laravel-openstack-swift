@@ -44,11 +44,25 @@ class SwiftServiceProvider extends ServiceProvider
 
     protected function getOsOptions($config)
     {
-        if($config['auth'] == 'token') {
-            return $this->getTokenOsOptions($config);
+        $options = [];
+        if(Arr::get($config, 'certEnable', false)) {
+            $options['requestOptions'] = [
+                'verify'  => Arr::get($config, 'certFile', ''),
+                'headers' => ['User-Agent' => 'PHP-OPENCLOUD/SDKv1.0'],
+            ];
         }
 
-        return $this->getAccountOsOptions($config);
+        if($config['auth'] == 'token') {
+            return \array_merge(
+                $options,
+                $this->getTokenOsOptions($config)
+            );
+        }
+
+        return \array_merge(
+            $options,
+            $this->getAccountOsOptions($config)
+        );
     }
 
 
@@ -86,13 +100,6 @@ class SwiftServiceProvider extends ServiceProvider
 
         if (array_key_exists('projectId', $config)) {
             $options['scope'] = ['project' => ['id' => $config['projectId']]];
-        }
-
-        if(Arr::get($config, 'certEnable', false)) {
-            $options['requestOptions'] = [
-                'verify'  => Arr::get($config, 'certFile', ''),
-                'headers' => ['User-Agent' => 'PHP-OPENCLOUD/SDKv1.0'],
-            ];
         }
 
         return $options;
