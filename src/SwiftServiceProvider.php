@@ -2,7 +2,7 @@
 
 namespace Mzur\Filesystem;
 
-use Carbon\CarbonInterval;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use League\Flysystem\Config;
 use League\Flysystem\Filesystem;
@@ -44,7 +44,6 @@ class SwiftServiceProvider extends ServiceProvider
 
     protected function getOsOptions($config)
     {
-        $config['deleteAfter'] = $this->generateExpireTime($config['expiredOn']);
         if($config['auth'] == 'token') {
             return $this->getTokenOsOptions($config);
         }
@@ -125,11 +124,5 @@ class SwiftServiceProvider extends ServiceProvider
         }
 
         return $flyConfig;
-    }
-
-    protected function generateExpireTime($expireOn)
-    {
-        $days = session('expireOn', $expireOn);
-        return (string) CarbonInterval::days($days)->seconds;
     }
 }
